@@ -16,7 +16,7 @@ $app->get('/[{name}]', function ($request, $response, $args) {
 class Pic extends Illuminate\Database\Eloquent\Model {
 
     protected $table = 'pic';
-    protected $fillable = ['deviceId','date','url','latitude','longitude','positive','negative','warning'];
+    protected $fillable = ['id','idDevice','date','url','latitude','longitude','positive','negative','warning','imagen'];
     public $timestamps = false;
 }
 
@@ -27,22 +27,31 @@ class Pic extends Illuminate\Database\Eloquent\Model {
 class Twin extends Illuminate\Database\Eloquent\Model {
 
     protected $table = 'twin';
-    protected $fillable = ['deviceId','idServidor','idAndroid'];
+    protected $fillable = ['servidor','android'];
     public $timestamps = false;
 }
 
+
+
 /**
- * Inserccion
+ * Inserccion de un pic
  */
 
 $app->post('/insertar/pic',function(){
-    $json = file_get_contents('php://input');
-    $pic = json_decode($json,true);
-    $ifp = fopen('images/'.$pic['url'],"da");
-    fwrite($ifp, base64_decode($pic['url']));
-    fclose($ifp);
-    $enlace = mysqli_connect('localhost','root','','pictwin');
-    $query = "INSERT INTO pic (idDevice,url,date,latitude,longitude,positive,negative,warning) VALUES ('".$pic['deviceId']."','".$pic['url']."','".$pic['date']."','".$pic['latitude']."','".$pic['longitude']."',0,0,0)";
-    $enlace->query($query);
-    mysqli_close($enlace);
+    $data = json_decode('php://input');
+    //Creacion de un nuevo pic
+    $pic  = new Pic;
+    //Asinacion
+    $pic->deviceid = $data['idDevice'];
+    $pic->date = $data['date'];
+    $pic->url = $data['url'];
+    $pic->latitude = $data['latitude'];
+    $pic->longitude = $data['longitude'];
+    $pic->positive = $data['positive'];
+    $pic->negative = $data['negative'];
+    $pic->warning = $data['warning'];
+    $pic->imagen = $data['imagen'];
+    $pic->save();
+
 });
+
